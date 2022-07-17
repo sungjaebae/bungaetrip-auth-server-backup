@@ -15,7 +15,7 @@ namespace AuthenticationServer.API.Services.TokenGenerators
             _configuration = configuration;
         }
 
-        public string GenerateToken(User user)
+        public AccessToken GenerateToken(User user)
         {
             SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.AccessTokenSecret));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -26,8 +26,15 @@ namespace AuthenticationServer.API.Services.TokenGenerators
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.UserName)
             };
-            JwtSecurityToken token = new JwtSecurityToken(_configuration.Issuer, _configuration.Audience, claims, DateTime.UtcNow, DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpirationMinutes), credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            DateTime expirationTime = DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpirationMinutes);
+            JwtSecurityToken token = new JwtSecurityToken(_configuration.Issuer, _configuration.Audience, claims, DateTime.UtcNow, expirationTime, credentials);
+            string value= new JwtSecurityTokenHandler().WriteToken(token);
+
+            return new AccessToken()
+            {
+                Value = value,
+                ExpirationTime = expirationTime
+            };
         }
     }
 }
