@@ -1,4 +1,4 @@
-﻿using AuthenticationServer.API.Models;
+﻿using AuthenticationServer.API.Entities;
 
 namespace AuthenticationServer.API.Services.RefreshTokenRepositories
 {

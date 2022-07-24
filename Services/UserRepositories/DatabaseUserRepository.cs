@@ -1,14 +1,14 @@
 ﻿using AuthenticationServer.API.Data;
-using AuthenticationServer.API.Models;
+using AuthenticationServer.API.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthenticationServer.API.Services.UserRepositories
 {
-    public class UserRepository : IUserRepository
+    public class DatabaseUserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext db;
+        private readonly AuthenticationDbContext db;
 
-        public UserRepository(ApplicationDbContext db)
+        public DatabaseUserRepository(AuthenticationDbContext db)
         {
             this.db = db;
         }

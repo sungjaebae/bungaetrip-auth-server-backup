@@ -22,8 +22,8 @@ namespace AuthenticationServer.API.Services.RefreshValidators
                 ValidIssuer = configuration.Issuer,
                 ValidAudience = configuration.Audience,
                 ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ClockSkew = TimeSpan.FromMinutes(1)
             };
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();

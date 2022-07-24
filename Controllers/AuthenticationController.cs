@@ -1,4 +1,4 @@
-﻿using AuthenticationServer.API.Models;
+﻿using AuthenticationServer.API.Entities;
 using AuthenticationServer.API.Models.Requests;
 using AuthenticationServer.API.Models.Responses;
 using AuthenticationServer.API.Services.Authenticators;
@@ -34,15 +34,11 @@ namespace AuthenticationServer.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
+        public async Task<ActionResult<User>> Register([FromBody] RegisterRequest registerRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-            if (registerRequest.Password != registerRequest.ConfirmPassword)
-            {
-                return BadRequest();
             }
 
             //겹치는 사용자가 있는가
@@ -68,7 +64,7 @@ namespace AuthenticationServer.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        public async Task<ActionResult<AuthenticatedUserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -90,7 +86,7 @@ namespace AuthenticationServer.API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequest refreshRequest)
+        public async Task<ActionResult<AuthenticatedUserResponse>> Refresh([FromBody] RefreshRequest refreshRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -121,7 +117,7 @@ namespace AuthenticationServer.API.Controllers
 
         [Authorize]
         [HttpDelete("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult> Logout()
         {
             string rawUserId = HttpContext.User.FindFirstValue("id");
             if(!int.TryParse(rawUserId, out int userId))

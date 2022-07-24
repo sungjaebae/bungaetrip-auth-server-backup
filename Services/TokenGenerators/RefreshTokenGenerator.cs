@@ -25,7 +25,7 @@ namespace AuthenticationServer.API.Services.TokenGenerators
             SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.RefreshTokenSecret));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            JwtSecurityToken token = new JwtSecurityToken(_configuration.Issuer, _configuration.Audience, null, DateTime.UtcNow, DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpirationMinutes), credentials);
+            JwtSecurityToken token = new JwtSecurityToken(_configuration.Issuer, _configuration.Audience, null, DateTime.UtcNow, expirationTime, credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

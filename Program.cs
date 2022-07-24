@@ -19,23 +19,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
-//    builder.Configuration.GetConnectionString("LocalDockerMySQL"),
-//    new MySqlServerVersion(new Version(8, 0, 29))
-//    ));
+builder.Services.AddDbContext<AuthenticationDbContext>(options =>
+    {
+        options.UseMySql(builder.Configuration.GetConnectionString("DatabaseConnectionString"), ServerVersion.Parse("8.0.29"));
+    });
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
-builder.Services.AddSingleton<IRefreshTokenRepository, InMemoryRefreshTokenRepository>();
+builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
 builder.Services.AddSingleton<AccessTokenGenerator>();
 builder.Services.AddSingleton<RefreshTokenGenerator>();
-builder.Services.AddSingleton<Authenticator>();
+builder.Services.AddScoped<Authenticator>();
 builder.Services.AddSingleton<RefreshTokenValidator>();
 
 AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
 builder.Configuration.Bind("Authentication", authenticationConfiguration);
 
-SecretClient keyVaultClient = new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential());
-authenticationConfiguration.AccessTokenSecret = keyVaultClient.GetSecret("access-token-secret").Value.Value;
+//SecretClient keyVaultClient = new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential());
+//authenticationConfiguration.AccessTokenSecret = keyVaultClient.GetSecret("access-token-secret").Value.Value;
+
 
 builder.Services.AddSingleton(authenticationConfiguration);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
@@ -43,11 +44,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     o.TokenValidationParameters = new TokenValidationParameters()
     {
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret)),
-        ValidIssuer = authenticationConfiguration.Audience,
+        ValidIssuer = authenticationConfiguration.Issuer,
         ValidAudience = authenticationConfiguration.Audience,
         ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ClockSkew = TimeSpan.FromMinutes(1)
     };
 });
@@ -61,21 +62,27 @@ builder.Services.AddSwaggerGen(options =>
         Description = "standard Authorization header using the Bearer scheme (\"bearer {token}\")",
         In = ParameterLocation.Header,
         Name = "Authorization",
-        Type=SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.ApiKey
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 var app = builder.Build();
 
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    using (AuthenticationDbContext context = scope.ServiceProvider.GetRequiredService<AuthenticationDbContext>())
+    {
+        context.Database.Migrate();
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+}
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

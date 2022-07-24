@@ -1,4 +1,5 @@
-﻿using AuthenticationServer.API.Models;
+﻿using AuthenticationServer.API.Entities;
+using AuthenticationServer.API.Models;
 using AuthenticationServer.API.Models.Responses;
 using AuthenticationServer.API.Services.RefreshTokenRepositories;
 using AuthenticationServer.API.Services.TokenGenerators;
