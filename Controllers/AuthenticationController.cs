@@ -1,14 +1,13 @@
-﻿using AuthenticationServer.API.Entities;
-using AuthenticationServer.API.Models.Requests;
-using AuthenticationServer.API.Models.Responses;
+﻿using AuthenticationServer.API.Dtos.Requests;
+using AuthenticationServer.API.Dtos.Responses;
+using AuthenticationServer.API.Entities;
 using AuthenticationServer.API.Services.Authenticators;
+using AuthenticationServer.API.Services.MemberRepositories;
 using AuthenticationServer.API.Services.PasswordHashers;
 using AuthenticationServer.API.Services.RefreshTokenRepositories;
 using AuthenticationServer.API.Services.RefreshValidators;
-using AuthenticationServer.API.Services.TokenGenerators;
-using AuthenticationServer.API.Services.UserRepositories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -18,23 +17,25 @@ namespace AuthenticationServer.API.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
-        private readonly IPasswordHasher passwordHasher;
+        private readonly UserManager<User> userRepository;
         private readonly RefreshTokenValidator refreshTokenValidator;
         private readonly IRefreshTokenRepository refreshTokenRepository;
         private readonly Authenticator authenticator;
+        private readonly IPasswordHasher passwordHasher;
+        private readonly IMemberRepository memberRepository;
 
-        public AuthenticationController(IUserRepository userRepository, IPasswordHasher passwordHasher, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator)
+        public AuthenticationController(UserManager<User> userRepository, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator, IPasswordHasher passwordHasher, IMemberRepository memberRepository)
         {
             this.userRepository = userRepository;
-            this.passwordHasher = passwordHasher;
             this.refreshTokenValidator = refreshTokenValidator;
             this.refreshTokenRepository = refreshTokenRepository;
             this.authenticator = authenticator;
+            this.passwordHasher = passwordHasher;
+            this.memberRepository = memberRepository;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register([FromBody] RegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -42,25 +43,53 @@ namespace AuthenticationServer.API.Controllers
             }
 
             //겹치는 사용자가 있는가
-            User existingUserByEmail = await userRepository.GetByEmail(registerRequest.Email);
-            if (existingUserByEmail != null)
+            User existingUserByEmail = await userRepository.FindByEmailAsync(registerRequest.Email);
+            if(existingUserByEmail != null)
             {
-                return Conflict();
+                return Conflict(new ErrorResponse("Email already exists."));
             }
-            User existingUserByUsername = await userRepository.GetByUserName(registerRequest.UserName);
+            User existingUserByUsername = await userRepository.FindByNameAsync(registerRequest.UserName);
             if (existingUserByUsername != null)
             {
-                return Conflict();
+                return Conflict(new ErrorResponse("Username already exists."));
             }
-            string passwordHash = passwordHasher.HashPassword(registerRequest.Password);
-            User registrationUser = new User()
+
+            var passwordHash = passwordHasher.HashPassword(registerRequest.Password);
+            Member registrationMember = new Member()
             {
+                CreatedAt = DateTime.UtcNow,
                 Email = registerRequest.Email,
                 UserName = registerRequest.UserName,
-                PasswordHash = passwordHash
+                Password = passwordHash,
+                Nickname = registerRequest.Nickname,
+                Role = "ROLE_USER"
             };
-            var user = await userRepository.Create(registrationUser);
-            return Ok(user); //passwordHash가 공개되므로 user를 내려주지 않아야 하나
+            int id = await memberRepository.Create(registrationMember);
+            
+            
+            User registrationUser = new User()
+            {
+                MemberId = id,
+                Email = registerRequest.Email,
+                UserName = registerRequest.UserName,
+                PasswordHash = passwordHash,
+            };
+            IdentityResult result = await userRepository.CreateAsync(registrationUser);
+            if(!result.Succeeded)
+            {
+                IdentityErrorDescriber errorDescriber = new IdentityErrorDescriber();
+                IdentityError primaryError = result.Errors.FirstOrDefault();
+                if(primaryError.Code == nameof(errorDescriber.DuplicateEmail))
+                {
+                    return Conflict(new ErrorResponse("Email already exists."));
+                }
+                if(primaryError.Code == nameof(errorDescriber.DuplicateUserName))
+                {
+                    return Conflict(new ErrorResponse("Username already exists."));
+                }
+
+            }
+            return Ok(new { status = "success"});
         }
 
         [HttpPost("login")]
@@ -70,7 +99,7 @@ namespace AuthenticationServer.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            User user = await userRepository.GetByUserName(loginRequest.UserName);
+            User user = await userRepository.FindByNameAsync(loginRequest.UserName);
             if (user == null)
             {
                 return Unauthorized();
@@ -105,7 +134,7 @@ namespace AuthenticationServer.API.Controllers
 
             await refreshTokenRepository.Delete(refreshTokenDto.Id);
 
-            User user = await userRepository.GetById(refreshTokenDto.UserId);
+            User user = await userRepository.FindByIdAsync(refreshTokenDto.UserId.ToString());
             if (user == null)
             {
                 return NotFound(new ErrorResponse("User not found"));

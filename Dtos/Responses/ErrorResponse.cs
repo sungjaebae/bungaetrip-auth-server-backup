@@ -1,4 +1,4 @@
-﻿namespace AuthenticationServer.API.Models.Responses
+﻿namespace AuthenticationServer.API.Dtos.Responses
 {
     public class ErrorResponse
     {
@@ -10,6 +10,6 @@
         }
         public ErrorResponse(string errorMessage) : this(new List<string>() { errorMessage })
         { }
-        
+
     }
 }

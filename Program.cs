@@ -1,11 +1,9 @@
 using AuthenticationServer.API.Data;
 using AuthenticationServer.API.Models;
 using AuthenticationServer.API.Services.Authenticators;
-using AuthenticationServer.API.Services.PasswordHashers;
 using AuthenticationServer.API.Services.RefreshTokenRepositories;
 using AuthenticationServer.API.Services.RefreshValidators;
 using AuthenticationServer.API.Services.TokenGenerators;
-using AuthenticationServer.API.Services.UserRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +12,31 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
+using AuthenticationServer.API.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using AuthenticationServer.API.Services.PasswordHashers;
+using AuthenticationServer.API.Services.MemberRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddIdentityCore<User>(o =>
+{
+    o.User.RequireUniqueEmail = true;
+    o.Password.RequireDigit = false;
+    o.Password.RequireNonAlphanumeric = false;
+    o.Password.RequireUppercase = false;
+    o.Password.RequiredLength = 0;
+}).AddEntityFrameworkStores<AuthenticationDbContext>();
 
 builder.Services.AddDbContext<AuthenticationDbContext>(options =>
     {
         options.UseMySql(builder.Configuration.GetConnectionString("DatabaseConnectionString"), ServerVersion.Parse("8.0.29"));
     });
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
+builder.Services.AddScoped<IMemberRepository, DatabaseMemberRepository>();
 builder.Services.AddSingleton<AccessTokenGenerator>();
 builder.Services.AddSingleton<RefreshTokenGenerator>();
 builder.Services.AddScoped<Authenticator>();
@@ -69,20 +80,24 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+
 using (IServiceScope scope = app.Services.CreateScope())
 {
     using (AuthenticationDbContext context = scope.ServiceProvider.GetRequiredService<AuthenticationDbContext>())
     {
-        context.Database.Migrate();
+        if (app.Environment.IsDevelopment())
+        {
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+        }
     }
 }
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();

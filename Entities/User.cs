@@ -1,18 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AuthenticationServer.API.Entities
 {
-    [Table("Member")]
-    public class User 
+    public class User :IdentityUser<int>
     {
-        [Key]
-        public int Id { get; set; }
-        [Required]
-        public string Email { get; set; }
-        [Required]
-        public string UserName { get; set; }
-        [Required]
-        public string PasswordHash { get; set; }
+        public int MemberId { get; set; }
+        [ForeignKey("MemberId")]
+        public Member Member { get; set; }
     }
 }

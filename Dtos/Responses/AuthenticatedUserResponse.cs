@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AuthenticationServer.API.Entities;
+using System.ComponentModel.DataAnnotations;
 
-namespace AuthenticationServer.API.Models.Responses
+namespace AuthenticationServer.API.Dtos.Responses
 {
     public class AuthenticatedUserResponse
     {
@@ -10,5 +11,7 @@ namespace AuthenticationServer.API.Models.Responses
         public DateTime AccessTokenExpirationTime { get; set; }
         [Required]
         public string RefreshToken { get; set; }
+        [Required]
+        public MemberDto Member { get; set; }
     }
 }

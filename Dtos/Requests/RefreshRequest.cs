@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AuthenticationServer.API.Models.Requests
+namespace AuthenticationServer.API.Dtos.Requests
 {
     public class RefreshRequest
     {

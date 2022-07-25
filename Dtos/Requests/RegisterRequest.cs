@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AuthenticationServer.API.Models.Requests
+namespace AuthenticationServer.API.Dtos.Requests
 {
     public class RegisterRequest
     {
@@ -11,6 +11,8 @@ namespace AuthenticationServer.API.Models.Requests
         public string UserName { get; set; }
         [Required]
         public string Password { get; set; }
+        [Required]
+        public string Nickname { get; set; }
 
 
     }
