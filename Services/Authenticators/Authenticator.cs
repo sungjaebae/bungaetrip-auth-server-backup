@@ -41,7 +41,7 @@ namespace AuthenticationServer.API.Services.Authenticators
             Member member = await memberRepository.FindById(user.MemberId);
             MemberDto memberDto = new MemberDto()
             {
-                Id = member.Id,
+                MemberId = member.Id,
                 Age = member.Age,
                 Description = member.Description,
                 Email = member.Email,

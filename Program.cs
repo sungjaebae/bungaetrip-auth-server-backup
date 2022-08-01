@@ -16,6 +16,11 @@ using AuthenticationServer.API.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using AuthenticationServer.API.Services.PasswordHashers;
 using AuthenticationServer.API.Services.MemberRepositories;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +68,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ClockSkew = TimeSpan.FromMinutes(1)
     };
 });
+//    .AddGoogle(googleOptions =>
+//{
+//    googleOptions.ClientId = builder.Configuration["OAuth:Google:ClientId"];
+//    googleOptions.ClientSecret = builder.Configuration["OAuth:Google:ClientSecret"];
+//});
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.KnownProxies.Add(Dns.GetHostEntry("nginx").AddressList[0]);
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -78,6 +93,15 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+                      {
+                          policy.WithOrigins("https://*.muinjijun.ml", "http://*.muinjijun.ml", "https://muinjijun.ml", "http://muinjijun.ml").AllowAnyHeader();
+                      });
+});
+
+
 var app = builder.Build();
 
 
@@ -92,13 +116,24 @@ using (IServiceScope scope = app.Services.CreateScope())
         }
     }
 }
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
-app.UseSwagger();
-app.UseSwaggerUI();
 
+app.UseSwagger(c => {
+    c.RouteTemplate = "api/swagger/{documentname}/swagger.json";
+});
+
+app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "My Cool API V1");
+    c.RoutePrefix = "api/swagger";
+});
+app.UseForwardedHeaders(new ForwardedHeadersOptions() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto});
+
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
