@@ -97,7 +97,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
                       {
-                          policy.WithOrigins("https://*.muinjijun.ml", "http://*.muinjijun.ml", "https://muinjijun.ml", "http://muinjijun.ml").AllowAnyHeader();
+                          policy.WithOrigins("https://*.gogetter.kr", "http://*.gogetter.kr", "https://gogetter.kr", "http://gogetter.kr").AllowAnyHeader();
                       });
 });
 
@@ -124,12 +124,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSwagger(c => {
-    c.RouteTemplate = "api/swagger/{documentname}/swagger.json";
+    c.RouteTemplate = "auth/swagger/{documentname}/swagger.json";
 });
 
 app.UseSwaggerUI(c => {
-    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "My Cool API V1");
-    c.RoutePrefix = "api/swagger";
+    c.SwaggerEndpoint("/auth/swagger/v1/swagger.json", "My Cool API V1");
+    c.RoutePrefix = "auth/swagger";
 });
 app.UseForwardedHeaders(new ForwardedHeadersOptions() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto});
 

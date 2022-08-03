@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace AuthenticationServer.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("auth/[controller]")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
