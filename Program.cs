@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
+using AuthenticationServer.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,7 @@ builder.Services.AddSingleton<AccessTokenGenerator>();
 builder.Services.AddSingleton<RefreshTokenGenerator>();
 builder.Services.AddScoped<Authenticator>();
 builder.Services.AddSingleton<RefreshTokenValidator>();
+builder.Services.AddScoped<DbInitializer>();
 
 AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
 builder.Configuration.Bind("Authentication", authenticationConfiguration);
@@ -113,6 +115,8 @@ using (IServiceScope scope = app.Services.CreateScope())
         {
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
+            DbInitializer dbInitializer=scope.ServiceProvider.GetRequiredService<DbInitializer>();
+            await dbInitializer.init();
         }
     }
 }
