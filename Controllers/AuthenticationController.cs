@@ -104,6 +104,11 @@ namespace AuthenticationServer.API.Controllers
             {
                 return Unauthorized();
             }
+            if (DateTime.Today<user.LockoutEnd)
+            {
+                return Unauthorized(new { status = "fail" , description ="widthdrawal user" });
+            }
+
             bool isCorrectPassword = passwordHasher.VerifyPassword(loginRequest.Password, user.PasswordHash);
             if (!isCorrectPassword)
             {
@@ -154,7 +159,23 @@ namespace AuthenticationServer.API.Controllers
                 return Unauthorized();
             }
             await refreshTokenRepository.DeleteAll(userId);
-            return NoContent();
+            return Ok(new { status = "success" });
+        }
+
+        [Authorize]
+        [HttpDelete("widthdrawal")]
+        public async Task<ActionResult> Widthdrawal()
+        {
+            string rawUserId = HttpContext.User.FindFirstValue("id");
+            if (!int.TryParse(rawUserId, out int userId))
+            {
+                return Unauthorized();
+            }
+            var user = await userRepository.FindByIdAsync(rawUserId);
+            await memberRepository.Delete(userId);
+            await userRepository.SetLockoutEnabledAsync(user, true);
+            await userRepository.SetLockoutEndDateAsync(user, DateTime.Today.AddYears(10));
+            return Ok(new { status = "success" });
         }
     }
 }
