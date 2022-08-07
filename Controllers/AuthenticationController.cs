@@ -163,8 +163,8 @@ namespace AuthenticationServer.API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("widthdrawal")]
-        public async Task<ActionResult> Widthdrawal()
+        [HttpDelete("withdrawal")]
+        public async Task<ActionResult> Withdrawal()
         {
             string rawUserId = HttpContext.User.FindFirstValue("id");
             if (!int.TryParse(rawUserId, out int userId))
