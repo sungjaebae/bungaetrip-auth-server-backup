@@ -23,7 +23,7 @@ namespace AuthenticationServer.API.Services.TokenGenerators
 
             List<Claim> claims = new List<Claim>()
             {
-                new Claim("id", user.Id.ToString()),
+                new Claim("id", user.MemberId.ToString()),
                 new Claim("email", user.Email),
                 new Claim("username", user.UserName)
             };
