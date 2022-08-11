@@ -166,13 +166,10 @@ namespace AuthenticationServer.API.Controllers
         [HttpDelete("withdrawal")]
         public async Task<ActionResult> Withdrawal()
         {
-            string rawUserId = HttpContext.User.FindFirstValue("id");
-            if (!int.TryParse(rawUserId, out int userId))
-            {
-                return Unauthorized();
-            }
-            var user = await userRepository.FindByIdAsync(rawUserId);
-            await memberRepository.Delete(userId);
+            string rawEmail = HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            
+            var user = await userRepository.FindByEmailAsync(rawEmail);
+            await memberRepository.Delete(user.MemberId);
             await userRepository.SetLockoutEnabledAsync(user, true);
             await userRepository.SetLockoutEndDateAsync(user, DateTime.Today.AddYears(10));
             return Ok(new { status = "success" });
