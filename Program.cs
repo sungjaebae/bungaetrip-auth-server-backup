@@ -48,9 +48,16 @@ builder.Services.AddSingleton<RefreshTokenGenerator>();
 builder.Services.AddScoped<Authenticator>();
 builder.Services.AddSingleton<RefreshTokenValidator>();
 builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddHttpClient("kakao", client => { client.BaseAddress = new Uri("https://kapi.kakao.com/v2/user/me"); });
+builder.Services.AddHttpClient("google", client => { client.BaseAddress = new Uri("https://oauth2.googleapis.com/tokeninfo"); });
+builder.Services.AddHttpClient("apple", client => { client.BaseAddress = new Uri("https://appleid.apple.com/auth/keys"); });
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<KakaoBackchannelAccessTokenAuthenticator>();
+builder.Services.AddScoped<GoogleBackchannelAccessTokenAuthenticator>();
+builder.Services.AddScoped<AppleBackchannelAccessTokenAuthenticator>();
 
-AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
-builder.Configuration.Bind("Authentication", authenticationConfiguration);
+JwtConfiguration authenticationConfiguration = new JwtConfiguration();
+builder.Configuration.Bind("JwtConfiguration", authenticationConfiguration);
 
 //SecretClient keyVaultClient = new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential());
 //authenticationConfiguration.AccessTokenSecret = keyVaultClient.GetSecret("access-token-secret").Value.Value;
@@ -70,11 +77,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ClockSkew = TimeSpan.FromMinutes(1)
     };
 });
-//    .AddGoogle(googleOptions =>
-//{
-//    googleOptions.ClientId = builder.Configuration["OAuth:Google:ClientId"];
-//    googleOptions.ClientSecret = builder.Configuration["OAuth:Google:ClientSecret"];
-//});
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.KnownProxies.Add(Dns.GetHostEntry("nginx").AddressList[0]);

@@ -1,6 +1,6 @@
 ﻿namespace AuthenticationServer.API.Models
 {
-    public class AuthenticationConfiguration
+    public class JwtConfiguration
     {
         public string AccessTokenSecret { get; set; }
         public double AccessTokenExpirationMinutes { get; set; }

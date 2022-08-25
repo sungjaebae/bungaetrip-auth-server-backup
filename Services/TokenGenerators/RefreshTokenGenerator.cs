@@ -11,9 +11,9 @@ namespace AuthenticationServer.API.Services.TokenGenerators
 {
     public class RefreshTokenGenerator
     {
-        private readonly AuthenticationConfiguration _configuration;
+        private readonly JwtConfiguration _configuration;
 
-        public RefreshTokenGenerator(AuthenticationConfiguration configuration)
+        public RefreshTokenGenerator(JwtConfiguration configuration)
         {
             _configuration = configuration;
         }

@@ -9,9 +9,9 @@ namespace AuthenticationServer.API.Services.TokenGenerators
 {
     public class AccessTokenGenerator
     {
-        private readonly AuthenticationConfiguration _configuration;
+        private readonly JwtConfiguration _configuration;
 
-        public AccessTokenGenerator(AuthenticationConfiguration configuration)
+        public AccessTokenGenerator(JwtConfiguration configuration)
         {
             _configuration = configuration;
         }

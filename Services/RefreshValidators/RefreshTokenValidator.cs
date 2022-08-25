@@ -7,9 +7,9 @@ namespace AuthenticationServer.API.Services.RefreshValidators
 {
     public class RefreshTokenValidator
     {
-        private readonly AuthenticationConfiguration configuration;
+        private readonly JwtConfiguration configuration;
 
-        public RefreshTokenValidator(AuthenticationConfiguration configuration)
+        public RefreshTokenValidator(JwtConfiguration configuration)
         {
             this.configuration = configuration;
         }
