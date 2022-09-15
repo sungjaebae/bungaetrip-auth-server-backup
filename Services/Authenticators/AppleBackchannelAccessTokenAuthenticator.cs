@@ -26,6 +26,8 @@ namespace AuthenticationServer.API.Services.Authenticators
             throw new HttpRequestException("An error occurred while retrieving the user profile.");
         }
 
+        
+
         return JsonDocument.Parse(await response.Content.ReadAsStringAsync(Context.RequestAborted));
     }
 }

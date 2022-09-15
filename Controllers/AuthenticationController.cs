@@ -28,9 +28,10 @@ namespace AuthenticationServer.API.Controllers
         private readonly IMemberRepository memberRepository;
         private readonly KakaoBackchannelAccessTokenAuthenticator kakaoBackchannelAccessTokenAuthenticator;
         private readonly GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator;
+        private readonly AppleBackchannelAccessTokenAuthenticator appleBackchannelAccessTokenAuthenticator;
         private readonly AuthenticationDbContext authenticationDbContext;
 
-        public AuthenticationController(UserManager<User> userRepository, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator, IPasswordHasher passwordHasher, IMemberRepository memberRepository, KakaoBackchannelAccessTokenAuthenticator kakaoBackchannelAccessTokenAuthenticator, GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator, AuthenticationDbContext authenticationDbContext)
+        public AuthenticationController(UserManager<User> userRepository, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator, IPasswordHasher passwordHasher, IMemberRepository memberRepository, KakaoBackchannelAccessTokenAuthenticator kakaoBackchannelAccessTokenAuthenticator, GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator, AuthenticationDbContext authenticationDbContext, AppleBackchannelAccessTokenAuthenticator appleBackchannelAccessTokenAuthenticator)
         {
             this.userRepository = userRepository;
             this.refreshTokenValidator = refreshTokenValidator;
@@ -41,6 +42,7 @@ namespace AuthenticationServer.API.Controllers
             this.kakaoBackchannelAccessTokenAuthenticator = kakaoBackchannelAccessTokenAuthenticator;
             this.googleBackchannelAccessTokenAuthenticator = googleBackchannelAccessTokenAuthenticator;
             this.authenticationDbContext = authenticationDbContext;
+            this.appleBackchannelAccessTokenAuthenticator = appleBackchannelAccessTokenAuthenticator;
         }
 
         [HttpPost("register")]
@@ -370,7 +372,7 @@ namespace AuthenticationServer.API.Controllers
             {
                 var token = "a758aa04c21334130a33b363df4cd1eff.0.ssq.1zAHspzyKdEs6MCDHbjeeA";
 
-                //jsonDocument = await googleBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
+                jsonDocument = await appleBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
             }
 
             return NotFound(new ErrorResponse("no oauth provider"));
