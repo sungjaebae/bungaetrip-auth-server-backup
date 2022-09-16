@@ -22,7 +22,7 @@ namespace AuthenticationServer.API.Services.Authenticators
         public async Task<JsonDocument> GetUserProfileAsync(
         [NotNull] string accessToken)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"?id_token={accessToken}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"?access_token={accessToken}");
 
             using var response = await Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
