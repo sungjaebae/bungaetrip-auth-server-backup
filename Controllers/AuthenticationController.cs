@@ -4,6 +4,7 @@ using AuthenticationServer.API.Dtos.Responses;
 using AuthenticationServer.API.Entities;
 using AuthenticationServer.API.Services.Authenticators;
 using AuthenticationServer.API.Services.MemberRepositories;
+using AuthenticationServer.API.Services.NicknameGenerators;
 using AuthenticationServer.API.Services.PasswordHashers;
 using AuthenticationServer.API.Services.RefreshTokenRepositories;
 using AuthenticationServer.API.Services.RefreshValidators;
@@ -30,8 +31,9 @@ namespace AuthenticationServer.API.Controllers
         private readonly GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator;
         private readonly AppleBackchannelAccessTokenAuthenticator appleBackchannelAccessTokenAuthenticator;
         private readonly AuthenticationDbContext authenticationDbContext;
+        private readonly NicknameGenerator nicknameGenerator;
 
-        public AuthenticationController(UserManager<User> userRepository, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator, IPasswordHasher passwordHasher, IMemberRepository memberRepository, KakaoBackchannelAccessTokenAuthenticator kakaoBackchannelAccessTokenAuthenticator, GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator, AuthenticationDbContext authenticationDbContext, AppleBackchannelAccessTokenAuthenticator appleBackchannelAccessTokenAuthenticator)
+        public AuthenticationController(UserManager<User> userRepository, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository, Authenticator authenticator, IPasswordHasher passwordHasher, IMemberRepository memberRepository, KakaoBackchannelAccessTokenAuthenticator kakaoBackchannelAccessTokenAuthenticator, GoogleBackchannelAccessTokenAuthenticator googleBackchannelAccessTokenAuthenticator, AuthenticationDbContext authenticationDbContext, AppleBackchannelAccessTokenAuthenticator appleBackchannelAccessTokenAuthenticator, NicknameGenerator nicknameGenerator)
         {
             this.userRepository = userRepository;
             this.refreshTokenValidator = refreshTokenValidator;
@@ -43,6 +45,7 @@ namespace AuthenticationServer.API.Controllers
             this.googleBackchannelAccessTokenAuthenticator = googleBackchannelAccessTokenAuthenticator;
             this.authenticationDbContext = authenticationDbContext;
             this.appleBackchannelAccessTokenAuthenticator = appleBackchannelAccessTokenAuthenticator;
+            this.nicknameGenerator = nicknameGenerator;
         }
 
         [HttpPost("register")]
@@ -70,9 +73,9 @@ namespace AuthenticationServer.API.Controllers
             {
                 CreatedAt = DateTime.UtcNow,
                 Email = registerRequest.Email,
-                UserName = registerRequest.UserName,
+                UserName = registerRequest.UserName ?? registerRequest.Email,
                 Password = passwordHash,
-                Nickname = registerRequest.Nickname,
+                Nickname = registerRequest.Nickname ?? nicknameGenerator.generateNickname(),
                 Role = "ROLE_USER"
             };
             int id = await memberRepository.Create(registrationMember);
@@ -304,12 +307,14 @@ namespace AuthenticationServer.API.Controllers
                     }
                     else //가입한 적 없는 이메일이므로 지금 가입한다.
                     {
+                        bool isNameExists = googleAccount.TryGetProperty("name", out var nickname);
+
                         Member registrationMember = new Member()
                         {
                             CreatedAt = DateTime.UtcNow,
                             Email = email,
                             UserName = email,
-                            Nickname = googleAccount.GetProperty("name").ToString(),
+                            Nickname = isNameExists? nickname.ToString(): nicknameGenerator.generateNickname(),
                             Role = "ROLE_USER"
                         };
                         int id = await memberRepository.Create(registrationMember);

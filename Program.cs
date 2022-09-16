@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
 using AuthenticationServer.API.Services;
+using AuthenticationServer.API.Services.NicknameGenerators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,8 @@ builder.Services.AddDbContext<AuthenticationDbContext>(options =>
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
 builder.Services.AddScoped<IMemberRepository, DatabaseMemberRepository>();
+builder.Services.AddSingleton<StringGenerator>();
+builder.Services.AddSingleton<NicknameGenerator>();
 builder.Services.AddSingleton<AccessTokenGenerator>();
 builder.Services.AddSingleton<RefreshTokenGenerator>();
 builder.Services.AddScoped<Authenticator>();
@@ -58,12 +61,15 @@ builder.Services.AddScoped<AppleBackchannelAccessTokenAuthenticator>();
 
 JwtConfiguration authenticationConfiguration = new JwtConfiguration();
 builder.Configuration.Bind("JwtConfiguration", authenticationConfiguration);
+RandomNicknameConfiguration randomNicknameConfiguration = new RandomNicknameConfiguration();
+builder.Configuration.Bind("RandomNicknameconfiguration", randomNicknameConfiguration);
 
 //SecretClient keyVaultClient = new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential());
 //authenticationConfiguration.AccessTokenSecret = keyVaultClient.GetSecret("access-token-secret").Value.Value;
 
 
 builder.Services.AddSingleton(authenticationConfiguration);
+builder.Services.AddSingleton(randomNicknameConfiguration);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
 {
     o.TokenValidationParameters = new TokenValidationParameters()
