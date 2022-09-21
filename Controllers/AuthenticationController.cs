@@ -177,14 +177,18 @@ namespace AuthenticationServer.API.Controllers
             {
                 jsonDocument = await kakaoBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
                 var kakaoAccount = jsonDocument.RootElement.GetProperty("kakao_account");
+                var kakaoId = jsonDocument.RootElement.GetProperty("id").GetInt64();
+
                 if (kakaoAccount.GetProperty("has_email").ToString() == "true" && kakaoAccount.GetProperty("is_email_verified").ToString() == "true" && kakaoAccount.GetProperty("is_email_valid").ToString() == "true")
                 {
                     var email = kakaoAccount.GetProperty("email").GetString();
-                    User existingUserByEmail = await userRepository.FindByEmailAsync(email);
 
-                    if (existingUserByEmail != null)
+                    User existingUsernameByEmail = await userRepository.FindByNameAsync(email);
+                    //User existingUsernameByKakaoId = await userRepository.FindByNameAsync();
+
+                    if (existingUsernameByEmail != null)
                     {
-                        var userLogin = authenticationDbContext.UserLogins.SingleOrDefault(e => e.UserId == existingUserByEmail.Id && e.LoginProvider == "kakao");
+                        var userLogin = authenticationDbContext.UserLogins.SingleOrDefault(e => e.UserId == existingUsernameByEmail.Id && e.LoginProvider == "kakao");
                         if (userLogin == null)//이미 가입된 이메일이 있고, 연결되어 있지 않다면 로그인해서 링크해라
                         {
                             return Conflict(new ErrorResponse("Email already exists. If you already sign up with email and password, use link external provider function"));
@@ -192,7 +196,7 @@ namespace AuthenticationServer.API.Controllers
                         }
                         else//이미 가입된 이메일이 있고, 연결되어 있다면 로그인 가능하다
                         {
-                            AuthenticatedUserResponse response = await authenticator.Authenticate(existingUserByEmail);
+                            AuthenticatedUserResponse response = await authenticator.Authenticate(existingUsernameByEmail);
                             return Ok(response);
                         }
                     }
@@ -238,42 +242,10 @@ namespace AuthenticationServer.API.Controllers
                         return Ok(response);
                     }
                 }
-                return BadRequest(new ErrorResponse("Kakao didn't provide enough informations"));
-                //               {
-                //  "id": 2403366545,
-                //  "connected_at": "2022-08-25T14:59:12Z",
-                //  "for_partner": {
-                //    "uuid": "CDsCNwM3BDcGKhgtGiMTJBUkEj4LOgw5CkA"
-                //  },
-                //  "properties": {
-                //    "nickname": "배성재",
-                //    "profile_image": "http://k.kakaocdn.net/dn/hGHeu/btrFT3o8ThQ/0zClP7QkQo9LalIzVHTmx1/img_640x640.jpg",
-                //    "thumbnail_image": "http://k.kakaocdn.net/dn/hGHeu/btrFT3o8ThQ/0zClP7QkQo9LalIzVHTmx1/img_110x110.jpg"
-                //  },
-                //  "kakao_account": {
-                //    "profile_needs_agreement": false,
-                //    "profile": {
-                //      "nickname": "배성재",
-                //      "thumbnail_image_url": "http://k.kakaocdn.net/dn/hGHeu/btrFT3o8ThQ/0zClP7QkQo9LalIzVHTmx1/img_110x110.jpg",
-                //      "profile_image_url": "http://k.kakaocdn.net/dn/hGHeu/btrFT3o8ThQ/0zClP7QkQo9LalIzVHTmx1/img_640x640.jpg",
-                //      "is_default_image": false
-                //    },
-                //    "has_email": true,
-                //    "email_needs_agreement": false,
-                //    "is_email_valid": true,
-                //    "is_email_verified": true,
-                //    "email": "hsm0156@kaist.ac.kr",
-                //    "has_phone_number": true,
-                //    "phone_number_needs_agreement": false,
-                //    "phone_number": "+82 10-2379-0156",
-                //    "has_birthday": true,
-                //    "birthday_needs_agreement": true,
-                //    "has_gender": true,
-                //    "gender_needs_agreement": false,
-                //    "gender": "male",
-                //    "is_kakaotalk_user": true
-                //  }
-                //}
+                else  //kakao에서 email을 주지 않은 경우
+                {
+
+                }
             }
 
             if (signinOAuthRequest.Provider == "google")
