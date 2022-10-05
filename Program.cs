@@ -23,12 +23,16 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
 using AuthenticationServer.API.Services;
 using AuthenticationServer.API.Services.NicknameGenerators;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddIdentityCore<User>(o =>
+var Configuration = builder.Configuration;
+builder.Services.AddIdentity<User, IdentityRole<int>>(o =>
 {
     o.User.RequireUniqueEmail = true;
     o.Password.RequireDigit = false;
@@ -38,9 +42,11 @@ builder.Services.AddIdentityCore<User>(o =>
 }).AddEntityFrameworkStores<AuthenticationDbContext>();
 
 builder.Services.AddDbContext<AuthenticationDbContext>(options =>
-    {
-        options.UseMySql(builder.Configuration.GetConnectionString("DatabaseConnectionString"), ServerVersion.Parse("8.0.29"));
-    });
+{
+    var connectionString = builder.Configuration.GetConnectionString("DatabaseConnectionString");
+    Console.WriteLine($"connectionString: {connectionString}");
+    options.UseMySql(connectionString, ServerVersion.Parse("8.0.29"));
+});
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
 builder.Services.AddScoped<IMemberRepository, DatabaseMemberRepository>();
@@ -70,7 +76,11 @@ builder.Configuration.Bind("RandomNicknameconfiguration", randomNicknameConfigur
 
 builder.Services.AddSingleton(authenticationConfiguration);
 builder.Services.AddSingleton(randomNicknameConfiguration);
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(o =>
 {
     o.TokenValidationParameters = new TokenValidationParameters()
     {
@@ -82,7 +92,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = false,
         ClockSkew = TimeSpan.FromMinutes(1)
     };
-});
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddGoogle(o =>
+{
+    o.ClientId = Configuration["OAuth:Google:ClientId"];
+    o.ClientSecret = Configuration["OAuth:Google:ClientSecret"];
+    o.SaveTokens = true;
+    o.CallbackPath = "/auth/signin-google";
+    o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}); 
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -111,8 +129,11 @@ builder.Services.AddCors(options =>
                           policy.WithOrigins("https://*.gogetter.kr", "http://*.gogetter.kr", "https://gogetter.kr", "http://gogetter.kr").AllowAnyHeader();
                       });
 });
-
-
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 var app = builder.Build();
 
 
@@ -130,22 +151,22 @@ using (IServiceScope scope = app.Services.CreateScope())
     }
 }
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
 
+app.UseForwardedHeaders();
+
 app.UseSwagger(c => {
     c.RouteTemplate = "auth/swagger/{documentname}/swagger.json";
 });
 
-app.UseSwaggerUI(c => {
+app.UseSwaggerUI(c => { 
     c.SwaggerEndpoint("/auth/swagger/v1/swagger.json", "My Cool API V1");
     c.RoutePrefix = "auth/swagger";
 });
-app.UseForwardedHeaders(new ForwardedHeadersOptions() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto});
-
+app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

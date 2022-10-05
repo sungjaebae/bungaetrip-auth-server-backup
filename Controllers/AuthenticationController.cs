@@ -11,7 +11,6 @@ using AuthenticationServer.API.Services.RefreshValidators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -385,7 +384,7 @@ namespace AuthenticationServer.API.Controllers
             var user = await userRepository.FindByEmailAsync(rawEmail);
             await memberRepository.Delete(user.MemberId);
             await userRepository.SetLockoutEnabledAsync(user, true);
-            await userRepository.SetLockoutEndDateAsync(user, DateTime.Today.AddYears(10));
+            await userRepository.SetLockoutEndDateAsync(user, DateTime.Today.AddYears(1));
             return Ok(new { status = "success" });
         }
     }
