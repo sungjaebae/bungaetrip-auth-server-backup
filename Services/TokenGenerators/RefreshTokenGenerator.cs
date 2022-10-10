@@ -6,14 +6,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AuthenticationServer.API.Models.AppSecrets;
 
 namespace AuthenticationServer.API.Services.TokenGenerators
 {
     public class RefreshTokenGenerator
     {
-        private readonly JwtConfiguration _configuration;
+        private readonly JwtConfigurations _configuration;
 
-        public RefreshTokenGenerator(JwtConfiguration configuration)
+        public RefreshTokenGenerator(JwtConfigurations configuration)
         {
             _configuration = configuration;
         }

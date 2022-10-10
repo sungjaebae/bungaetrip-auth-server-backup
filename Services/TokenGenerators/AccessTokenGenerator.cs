@@ -4,14 +4,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static AuthenticationServer.API.Models.AppSecrets;
 
 namespace AuthenticationServer.API.Services.TokenGenerators
 {
     public class AccessTokenGenerator
     {
-        private readonly JwtConfiguration _configuration;
+        private readonly JwtConfigurations _configuration;
 
-        public AccessTokenGenerator(JwtConfiguration configuration)
+        public AccessTokenGenerator(JwtConfigurations configuration)
         {
             _configuration = configuration;
         }
@@ -24,7 +25,7 @@ namespace AuthenticationServer.API.Services.TokenGenerators
             List<Claim> claims = new List<Claim>()
             {
                 new Claim("id", user.MemberId.ToString()),
-                new Claim("email", user.Email),
+                new Claim("email", user.Email??"OAuth"),
                 new Claim("username", user.UserName)
             };
             DateTime expirationTime = DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpirationMinutes);

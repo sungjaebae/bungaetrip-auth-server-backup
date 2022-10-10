@@ -8,6 +8,7 @@ using AuthenticationServer.API.Services.NicknameGenerators;
 using AuthenticationServer.API.Services.PasswordHashers;
 using AuthenticationServer.API.Services.RefreshTokenRepositories;
 using AuthenticationServer.API.Services.RefreshValidators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -355,14 +356,7 @@ namespace AuthenticationServer.API.Controllers
         }
 
 
-        //[Authorize]
-        //[HttpPost("linkOAuth")]
-        //public async Task<IActionResult> LinkOAuth([FromBody] SigninOAuthRequest signinOAuthRequest)
-        //{
-
-        //}
-
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("logout")]
         public async Task<ActionResult> Logout()
         {
@@ -375,7 +369,7 @@ namespace AuthenticationServer.API.Controllers
             return Ok(new { status = "success" });
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("withdrawal")]
         public async Task<ActionResult> Withdrawal()
         {

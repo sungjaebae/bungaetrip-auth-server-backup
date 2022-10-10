@@ -1,4 +1,5 @@
 ﻿using AuthenticationServer.API.Models;
+using Microsoft.Extensions.Options;
 
 namespace AuthenticationServer.API.Services.NicknameGenerators
 {
@@ -11,13 +12,13 @@ namespace AuthenticationServer.API.Services.NicknameGenerators
         private readonly StringGenerator stringGenerator;
         private readonly RandomNicknameConfiguration randomNicknameConfiguration;
 
-        public NicknameGenerator(StringGenerator stringGenerator, RandomNicknameConfiguration randomNicknameConfiguration)
+        public NicknameGenerator(StringGenerator stringGenerator, IOptions<RandomNicknameConfiguration> randomNicknameConfiguration)
         {
             this.stringGenerator = stringGenerator;
-            this.randomNicknameConfiguration = randomNicknameConfiguration;
-            this.adjective = randomNicknameConfiguration.Adjective;
-            this.noun = randomNicknameConfiguration.Noun;
-            this.randomLength = randomNicknameConfiguration.RandomLength;
+            this.randomNicknameConfiguration = randomNicknameConfiguration.Value;
+            this.adjective = this.randomNicknameConfiguration.Adjective;
+            this.noun = this.randomNicknameConfiguration.Noun;
+            this.randomLength = this.randomNicknameConfiguration.RandomLength;
         }
 
         public string generateNickname()

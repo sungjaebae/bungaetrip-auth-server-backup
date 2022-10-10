@@ -27,14 +27,33 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using static AuthenticationServer.API.Models.AppSecrets;
+using AuthenticationServer.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+IConfigurationSection appSettingsSection = Startup.SetupConfiguration(builder.Services);
+AppSettings appSettings = new AppSettings();
+appSettingsSection.Bind(appSettings);
+
+
+IConfigurationSection randomNicknameConfiguration =
+builder.Configuration.GetSection(nameof(RandomNicknameConfiguration));
+builder.Services.Configure<RandomNicknameConfiguration>(randomNicknameConfiguration);
+
+IConfigurationSection appSecretsSection = builder.Configuration.GetSection(nameof(AppSecrets));
+builder.Services.Configure<AppSecrets>(appSecretsSection);
+AppSecrets appSecrets = new AppSecrets();
+appSecretsSection.Bind(appSecrets);
+JwtConfigurations jwtConfiguration = appSecrets.JwtConfiguration;
+
 var Configuration = builder.Configuration;
+builder.Services.AddSingleton(jwtConfiguration);
+builder.Services.AddSingleton(randomNicknameConfiguration);
 builder.Services.AddIdentity<User, IdentityRole<int>>(o =>
 {
-    o.User.RequireUniqueEmail = true;
+    o.User.RequireUniqueEmail = false;
     o.Password.RequireDigit = false;
     o.Password.RequireNonAlphanumeric = false;
     o.Password.RequireUppercase = false;
@@ -43,7 +62,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(o =>
 
 builder.Services.AddDbContext<AuthenticationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DatabaseConnectionString");
+    var connectionString = appSecrets.ConnectionStrings.DbConnectionString;
     Console.WriteLine($"connectionString: {connectionString}");
     options.UseMySql(connectionString, ServerVersion.Parse("8.0.29"));
 });
@@ -65,42 +84,50 @@ builder.Services.AddScoped<KakaoBackchannelAccessTokenAuthenticator>();
 builder.Services.AddScoped<GoogleBackchannelAccessTokenAuthenticator>();
 builder.Services.AddScoped<AppleBackchannelAccessTokenAuthenticator>();
 
-JwtConfiguration authenticationConfiguration = new JwtConfiguration();
-builder.Configuration.Bind("JwtConfiguration", authenticationConfiguration);
-RandomNicknameConfiguration randomNicknameConfiguration = new RandomNicknameConfiguration();
-builder.Configuration.Bind("RandomNicknameconfiguration", randomNicknameConfiguration);
-
-//SecretClient keyVaultClient = new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential());
-//authenticationConfiguration.AccessTokenSecret = keyVaultClient.GetSecret("access-token-secret").Value.Value;
-
-
-builder.Services.AddSingleton(authenticationConfiguration);
-builder.Services.AddSingleton(randomNicknameConfiguration);
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(o =>
 {
     o.TokenValidationParameters = new TokenValidationParameters()
     {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret)),
-        ValidIssuer = authenticationConfiguration.Issuer,
-        ValidAudience = authenticationConfiguration.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.AccessTokenSecret)),
+        ValidIssuer = jwtConfiguration.Issuer,
+        ValidAudience = jwtConfiguration.Audience,
         ValidateIssuerSigningKey = true,
         ValidateIssuer = false,
         ValidateAudience = false,
-        ClockSkew = TimeSpan.FromMinutes(1)
+        ClockSkew = TimeSpan.FromMinutes(1),
     };
 }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-.AddGoogle(o =>
+.AddGoogle(options =>
 {
-    o.ClientId = Configuration["OAuth:Google:ClientId"];
-    o.ClientSecret = Configuration["OAuth:Google:ClientSecret"];
-    o.SaveTokens = true;
-    o.CallbackPath = "/auth/signin-google";
-    o.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}); 
+    var googleSecrets = appSecrets.GoogleSecrets;
+
+    options.ClientId = googleSecrets.AuthClientId;
+    options.ClientSecret = googleSecrets.AuthClientSecret;
+    options.CallbackPath = "/auth/signin-google";
+    //this function is get user google profile image
+    options.Scope.Add("profile");
+    options.SignInScheme = IdentityConstants.ExternalScheme;
+})
+.AddKakaoTalk(options =>
+{
+    var kakaoSecrets = appSecrets.KakaoSecrets;
+    options.ClientId = kakaoSecrets.AuthClientId;
+    options.ClientSecret = kakaoSecrets.AuthClientSecret;
+    options.CallbackPath = "/auth/signin-kakao";
+    options.Scope.Add("account_email");
+    options.SignInScheme = IdentityConstants.ExternalScheme;
+}).AddApple(options =>
+{
+    var appleSecrets = appSecrets.AppleSecrets;
+    options.ClientId = appleSecrets.AuthClientId;
+    options.TeamId = appleSecrets.AuthTeamId;
+    options.KeyId = appleSecrets.keyID;
+    options.UsePrivateKey((keyId) =>
+                builder.Environment.ContentRootFileProvider.GetFileInfo($"AuthKey_{keyId}.p8"));
+    options.CallbackPath = "/auth/signin-apple";
+    options.SignInScheme = IdentityConstants.ExternalScheme;
+});
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -108,7 +135,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -136,6 +162,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 var app = builder.Build();
 
+app.UseHttpLogging();
 
 using (IServiceScope scope = app.Services.CreateScope())
 {

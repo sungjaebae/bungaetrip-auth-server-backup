@@ -2,14 +2,15 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using static AuthenticationServer.API.Models.AppSecrets;
 
 namespace AuthenticationServer.API.Services.RefreshValidators
 {
     public class RefreshTokenValidator
     {
-        private readonly JwtConfiguration configuration;
+        private readonly JwtConfigurations configuration;
 
-        public RefreshTokenValidator(JwtConfiguration configuration)
+        public RefreshTokenValidator(JwtConfigurations configuration)
         {
             this.configuration = configuration;
         }
