@@ -19,4 +19,5 @@ RUN dotnet publish "AuthenticationServer.API.csproj" -c Release -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY *.p8 ./
 ENTRYPOINT ["dotnet", "AuthenticationServer.API.dll"]
