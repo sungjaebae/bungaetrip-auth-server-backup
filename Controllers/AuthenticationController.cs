@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -172,187 +174,117 @@ namespace AuthenticationServer.API.Controllers
             }
 
             JsonDocument? jsonDocument = null;
+            string username = null;
+            string email = null;
 
-            if (signinOAuthRequest.Provider == "kakao")
+            if (signinOAuthRequest.Provider == "Kakao")
             {
-                jsonDocument = await kakaoBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
+                signinOAuthRequest.Provider = "KakaoTalk";
+
+                try
+                {
+                    jsonDocument = await kakaoBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(new ErrorResponse("invalid token"));
+                }
                 var kakaoAccount = jsonDocument.RootElement.GetProperty("kakao_account");
                 var kakaoId = jsonDocument.RootElement.GetProperty("id").GetInt64();
 
                 if (kakaoAccount.GetProperty("has_email").ToString() == "true" && kakaoAccount.GetProperty("is_email_verified").ToString() == "true" && kakaoAccount.GetProperty("is_email_valid").ToString() == "true")
                 {
-                    var email = kakaoAccount.GetProperty("email").GetString();
-
-                    User existingUsernameByEmail = await userRepository.FindByNameAsync(email);
-                    //User existingUsernameByKakaoId = await userRepository.FindByNameAsync();
-
-                    if (existingUsernameByEmail != null)
-                    {
-                        var userLogin = authenticationDbContext.UserLogins.SingleOrDefault(e => e.UserId == existingUsernameByEmail.Id && e.LoginProvider == "kakao");
-                        if (userLogin == null)//이미 가입된 이메일이 있고, 연결되어 있지 않다면 로그인해서 링크해라
-                        {
-                            return Conflict(new ErrorResponse("Email already exists. If you already sign up with email and password, use link external provider function"));
-
-                        }
-                        else//이미 가입된 이메일이 있고, 연결되어 있다면 로그인 가능하다
-                        {
-                            AuthenticatedUserResponse response = await authenticator.Authenticate(existingUsernameByEmail);
-                            return Ok(response);
-                        }
-                    }
-                    else //가입한 적 없는 이메일이므로 지금 가입한다.
-                    {
-                        Member registrationMember = new Member()
-                        {
-                            CreatedAt = DateTime.UtcNow,
-                            Email = email,
-                            UserName = email,
-                            Nickname = kakaoAccount.GetProperty("profile").GetProperty("nickname").ToString(),
-                            Role = "ROLE_USER"
-                        };
-                        int id = await memberRepository.Create(registrationMember);
-
-
-                        User registrationUser = new User()
-                        {
-                            MemberId = id,
-                            Email = email,
-                            UserName = email,
-                        };
-                        IdentityResult result = await userRepository.CreateAsync(registrationUser);
-                        if (!result.Succeeded)
-                        {
-                            IdentityErrorDescriber errorDescriber = new IdentityErrorDescriber();
-                            IdentityError primaryError = result.Errors.FirstOrDefault();
-                            if (primaryError.Code == nameof(errorDescriber.DuplicateEmail))
-                            {
-                                return Conflict(new ErrorResponse("Email already exists."));
-                            }
-                            if (primaryError.Code == nameof(errorDescriber.DuplicateUserName))
-                            {
-                                return Conflict(new ErrorResponse("Username already exists."));
-                            }
-
-                        }
-                        var user = await userRepository.FindByEmailAsync(email);
-                        await authenticationDbContext.UserLogins.AddAsync(new IdentityUserLogin<int>() { LoginProvider = "kakao", ProviderDisplayName = "kakao", ProviderKey = jsonDocument.RootElement.GetProperty("id").ToString(), UserId = user.Id });
-                        await authenticationDbContext.SaveChangesAsync();
-
-                        AuthenticatedUserResponse response = await authenticator.Authenticate(user);
-                        return Ok(response);
-                    }
+                    email = kakaoAccount.GetProperty("email").GetString();
                 }
-                else  //kakao에서 email을 주지 않은 경우
-                {
-
-                }
+                username = signinOAuthRequest.Provider + kakaoId;
             }
 
-            if (signinOAuthRequest.Provider == "google")
+            if (signinOAuthRequest.Provider == "Google")
             {
-                try { 
-                jsonDocument = await googleBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
+                try
+                {
+                    jsonDocument = await googleBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     return BadRequest(new ErrorResponse("invalid token"));
                 }
-                    var googleAccount = jsonDocument.RootElement;
+                var googleAccount = jsonDocument.RootElement;
                 if (googleAccount.GetProperty("email_verified").ToString() == "true")
                 {
-                    var email = googleAccount.GetProperty("email").GetString();
-                    User findByEmail = await userRepository.FindByEmailAsync(email);
-
-                    if (findByEmail != null)
-                    {
-                        var userLogin = authenticationDbContext.UserLogins.SingleOrDefault(e => e.UserId == findByEmail.Id && e.LoginProvider == "google");
-                        if (userLogin == null)//이미 가입된 이메일이 있고, 연결되어 있지 않다면 로그인해서 링크해라
-                        {
-                            return Conflict(new ErrorResponse("Email already exists. If you already sign up with email and password, use link external provider function"));
-                        }
-                        else//이미 가입된 이메일이 있고, 연결되어 있다면 로그인 가능하다
-                        {
-                            AuthenticatedUserResponse response = await authenticator.Authenticate(findByEmail);
-                            return Ok(response);
-                        }
-
-                    }
-                    else //가입한 적 없는 이메일이므로 지금 가입한다.
-                    {
-                        bool isNameExists = googleAccount.TryGetProperty("name", out var nickname);
-
-                        Member registrationMember = new Member()
-                        {
-                            CreatedAt = DateTime.UtcNow,
-                            Email = email,
-                            UserName = email,
-                            Nickname = isNameExists? nickname.ToString(): nicknameGenerator.generateNickname(),
-                            Role = "ROLE_USER"
-                        };
-                        int id = await memberRepository.Create(registrationMember);
-
-
-                        User registrationUser = new User()
-                        {
-                            MemberId = id,
-                            Email = email,
-                            UserName = email,
-                        };
-                        IdentityResult result = await userRepository.CreateAsync(registrationUser);
-                        if (!result.Succeeded)
-                        {
-                            IdentityErrorDescriber errorDescriber = new IdentityErrorDescriber();
-                            IdentityError primaryError = result.Errors.FirstOrDefault();
-                            if (primaryError.Code == nameof(errorDescriber.DuplicateEmail))
-                            {
-                                return Conflict(new ErrorResponse("Email already exists."));
-                            }
-                            if (primaryError.Code == nameof(errorDescriber.DuplicateUserName))
-                            {
-                                return Conflict(new ErrorResponse("Username already exists."));
-                            }
-
-                        }
-                        var user = await userRepository.FindByEmailAsync(email);
-                        await authenticationDbContext.UserLogins.AddAsync(new IdentityUserLogin<int>() { LoginProvider = "google", ProviderDisplayName = "google", ProviderKey = jsonDocument.RootElement.GetProperty("sub").ToString(), UserId = user.Id });
-                        await authenticationDbContext.SaveChangesAsync();
-
-                        AuthenticatedUserResponse response = await authenticator.Authenticate(user);
-                        return Ok(response);
-                    }
-
-
-                    //{
-                    //  "iss": "https://accounts.google.com",
-                    //  "nbf": "1661439552",
-                    //  "aud": "624353687612-fjt6b8kmdfrsmhc9efmps7b1m9ek11l1.apps.googleusercontent.com",
-                    //  "sub": "103877988597939757746",
-                    //  "email": "hsm0156@gmail.com",
-                    //  "email_verified": "true",
-                    //  "azp": "624353687612-fjt6b8kmdfrsmhc9efmps7b1m9ek11l1.apps.googleusercontent.com",
-                    //  "name": "배성재",
-                    //  "picture": "https://lh3.googleusercontent.com/a/AItbvml5lfkoobduPvtvYUwITSfsGwAROc6WnyYCwejf=s96-c",
-                    //  "given_name": "성재",
-                    //  "family_name": "배",
-                    //  "iat": "1661439852",
-                    //  "exp": "1661443452",
-                    //  "jti": "0a1206626dacb0397120fb7f058653eef84408c1",
-                    //  "alg": "RS256",
-                    //  "kid": "402f305b70581329ff289b5b3a67283806eca893",
-                    //  "typ": "JWT"
-                    //}
+                    email = googleAccount.GetProperty("email").GetString();
                 }
-                return BadRequest(new ErrorResponse("Google didn't provide enough informations"));
+                username = signinOAuthRequest.Provider + googleAccount.GetProperty("sub").GetString();
             }
 
-            if (signinOAuthRequest.Provider == "apple")
+            if (signinOAuthRequest.Provider == "Apple")
             {
-                var token = "a758aa04c21334130a33b363df4cd1eff.0.ssq.1zAHspzyKdEs6MCDHbjeeA";
 
-                jsonDocument = await appleBackchannelAccessTokenAuthenticator.GetUserProfileAsync(signinOAuthRequest.AccessToken);
+                var publicKey = await appleBackchannelAccessTokenAuthenticator.GetPublicKeyAsync();
+                //var jwks = await new HttpClient().GetStringAsync("https://appleid.apple.com/auth/keys");
+                var validationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKeys = new JsonWebKeySet(publicKey).Keys,
+                    ValidAudience = "aud", 
+                    ValidIssuer = "iss",
+                    ValidateLifetime = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true
+                };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                try
+                {
+                    var claimsPrincipal = tokenHandler.ValidateToken(signinOAuthRequest.AccessToken, validationParameters, out SecurityToken securityToken);
+                    if (securityToken == null)
+                    {
+                        return BadRequest(new ErrorResponse("Apple Login Failed"));
+                    }
+                    username = signinOAuthRequest.Provider+ claimsPrincipal.Claims.First(u => u.Type == ClaimTypes.NameIdentifier).Value;
+                    email = claimsPrincipal.Claims.First(u => u.Type == ClaimTypes.Email).Value;
+                }
+                catch (Exception ex)
+                {
+                    // 인증 실패
+                    return BadRequest(new ErrorResponse("Apple Login Failed")); ;
+                }
             }
 
-            return NotFound(new ErrorResponse("no oauth provider"));
+            if (username == null)
+            { 
+                return NotFound(new ErrorResponse("no oauth provider"));
+            }
+            //기존에 외부 로그인한 사용자인지 확인한다
+            User user = await userRepository.FindByNameAsync(username);
+            if (user == null)
+            {
+                Member registrationMember = new Member()
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UserName = username,
+                    Email = email,
+                    Nickname = nicknameGenerator.generateNickname(),
+                    Role = "ROLE_USER"
+                };
+                user = new User()
+                {
+                    Member = registrationMember,
+                    UserName = username,
+                    Email = email
+                };
+                IdentityResult result = await userRepository.CreateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+            }
+            if (DateTime.Today < user.LockoutEnd)
+            {
+                return Unauthorized(new { status = "fail", description = "widthdrawal user" });
+            }
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
+
+            return Ok(response);
         }
 
 
