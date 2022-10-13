@@ -23,7 +23,7 @@ namespace AuthenticationServer.API.Services.NicknameGenerators
 
         public string generateNickname()
         {
-            return $"{adjective[rand.Next(0, adjective.Length-1)]} {noun[rand.Next(0,noun.Length-1)]}_{stringGenerator.getRandomString(randomLength)}";
+            return $"{adjective[rand.Next(0, adjective.Length-1)]} {noun[rand.Next(0,noun.Length-1)]}#{stringGenerator.getRandomString(randomLength)}";
         }
     }
 
