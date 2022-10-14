@@ -1,7 +1,9 @@
 ﻿using AuthenticationServer.API.Data;
+using AuthenticationServer.API.Dtos;
 using AuthenticationServer.API.Dtos.Requests;
 using AuthenticationServer.API.Dtos.Responses;
 using AuthenticationServer.API.Entities;
+using AuthenticationServer.API.Migrations;
 using AuthenticationServer.API.Services.Authenticators;
 using AuthenticationServer.API.Services.MemberRepositories;
 using AuthenticationServer.API.Services.NicknameGenerators;
@@ -278,7 +280,8 @@ namespace AuthenticationServer.API.Controllers
                     return BadRequest(result.Errors);
                 }
             }
-            if (DateTime.Today < user.LockoutEnd)
+            Member member= await memberRepository.FindById(user.MemberId);
+            if (member.DeletedAt != null)
             {
                 return Unauthorized(new { status = "fail", description = "widthdrawal user" });
             }
@@ -305,12 +308,15 @@ namespace AuthenticationServer.API.Controllers
         [HttpDelete("withdrawal")]
         public async Task<ActionResult> Withdrawal()
         {
-            string rawEmail = HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            string rawUsername = HttpContext.User.FindFirstValue("username");
 
-            var user = await userRepository.FindByEmailAsync(rawEmail);
+            var user = await userRepository.FindByNameAsync(rawUsername);
+            var member = await memberRepository.FindById(user.MemberId);
+            if(member.DeletedAt!=null)
+            {
+                return Conflict(new { status = "fail", description = "already widthdrawal user" });
+            }
             await memberRepository.Delete(user.MemberId);
-            await userRepository.SetLockoutEnabledAsync(user, true);
-            await userRepository.SetLockoutEndDateAsync(user, DateTime.Today.AddYears(1));
             return Ok(new { status = "success" });
         }
     }
