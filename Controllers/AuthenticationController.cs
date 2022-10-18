@@ -132,7 +132,7 @@ namespace AuthenticationServer.API.Controllers
             {
                 return Unauthorized();
             }
-            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user,false);
 
             return Ok(response);
         }
@@ -163,7 +163,7 @@ namespace AuthenticationServer.API.Controllers
                 return NotFound(new ErrorResponse("User not found"));
             }
 
-            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user,false);
             return Ok(response);
         }
 
@@ -257,9 +257,11 @@ namespace AuthenticationServer.API.Controllers
                 return NotFound(new ErrorResponse("no oauth provider"));
             }
             //기존에 외부 로그인한 사용자인지 확인한다
+            bool isNewUser = false;
             User user = await userRepository.FindByNameAsync(username);
             if (user == null)
             {
+                isNewUser= true;
                 Member registrationMember = new Member()
                 {
                     CreatedAt = DateTime.UtcNow,
@@ -285,7 +287,7 @@ namespace AuthenticationServer.API.Controllers
             {
                 return Unauthorized(new { status = "fail", description = "widthdrawal user" });
             }
-            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user, isNewUser);
 
             return Ok(response);
         }

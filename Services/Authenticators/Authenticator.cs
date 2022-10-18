@@ -26,7 +26,7 @@ namespace AuthenticationServer.API.Services.Authenticators
             this.memberRepository = memberRepository;
         }
 
-        public async Task<AuthenticatedUserResponse> Authenticate(User user)
+        public async Task<AuthenticatedUserResponse> Authenticate(User user, bool isNewUser)
         {
             AccessToken accessToken = _accessTokenGenerator.GenerateToken(user);
             string refreshToken = _refreshTokenGenerator.GenerateToken();
@@ -55,7 +55,8 @@ namespace AuthenticationServer.API.Services.Authenticators
                 AccessToken = accessToken.Value,
                 AccessTokenExpirationTime = accessToken.ExpirationTime,
                 RefreshToken = refreshToken,
-                Member = memberDto
+                Member = memberDto,
+                IsNewUser = isNewUser
             };
         }
     }
