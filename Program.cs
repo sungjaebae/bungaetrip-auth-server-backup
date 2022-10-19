@@ -171,21 +171,20 @@ using (IServiceScope scope = app.Services.CreateScope())
     }
 }
 
+app.UseForwardedHeaders();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger(c => {
+        c.RouteTemplate = "auth/swagger/{documentname}/swagger.json";
+    });
+
+    app.UseSwaggerUI(c => {
+        c.SwaggerEndpoint("/auth/swagger/v1/swagger.json", "My Cool API V1");
+        c.RoutePrefix = "auth/swagger";
+    });
 }
 
-app.UseForwardedHeaders();
-
-app.UseSwagger(c => {
-    c.RouteTemplate = "auth/swagger/{documentname}/swagger.json";
-});
-
-app.UseSwaggerUI(c => { 
-    c.SwaggerEndpoint("/auth/swagger/v1/swagger.json", "My Cool API V1");
-    c.RoutePrefix = "auth/swagger";
-});
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
