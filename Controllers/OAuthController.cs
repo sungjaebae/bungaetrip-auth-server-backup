@@ -103,7 +103,7 @@ namespace AuthenticationServer.API.Controllers
             {
                 return Unauthorized(new { status = "fail", description = "widthdrawal user" });
             }
-            AuthenticatedUserResponse response = await authenticator.Authenticate(user,false);
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
 
             return Ok(response);
         }
