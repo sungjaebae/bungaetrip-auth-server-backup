@@ -13,5 +13,7 @@ namespace AuthenticationServer.API.Dtos.Responses
         public string RefreshToken { get; set; }
         [Required]
         public MemberDto Member { get; set; }
-    }
+        [Required]
+        public int IsAgreeToTermsOfService {get; set;}
+}
 }

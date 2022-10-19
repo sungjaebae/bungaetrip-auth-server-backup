@@ -63,7 +63,6 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(o =>
 builder.Services.AddDbContext<AuthenticationDbContext>(options =>
 {
     var connectionString = appSecrets.ConnectionStrings.DbConnectionString;
-    Console.WriteLine($"connectionString: {connectionString}");
     options.UseMySql(connectionString, ServerVersion.Parse("8.0.29"));
 });
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
@@ -168,13 +167,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 {
     using (AuthenticationDbContext context = scope.ServiceProvider.GetRequiredService<AuthenticationDbContext>())
     {
-        if (app.Environment.IsDevelopment())
-        {
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-            DbInitializer dbInitializer=scope.ServiceProvider.GetRequiredService<DbInitializer>();
-            await dbInitializer.init();
-        }
+        context.Database.Migrate();
     }
 }
 

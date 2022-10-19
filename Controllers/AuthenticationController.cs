@@ -107,7 +107,7 @@ namespace AuthenticationServer.API.Controllers
                 }
 
             }
-            return Ok(new { status = "success" });
+            return Ok(new { status = "success", IsAgreeToTermsOfService = false });
         }
 
         [HttpPost("login")]
@@ -317,6 +317,24 @@ namespace AuthenticationServer.API.Controllers
                 return Conflict(new { status = "fail", description = "already widthdrawal user" });
             }
             await memberRepository.Delete(user.MemberId);
+            return Ok(new { status = "success" });
+        }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("TermsOfServiceVersion")]
+        public async Task<ActionResult> TermsOfServiceVersion([FromBody]TermsOfServiceVerstionUpdateRequest termsOfServiceVerstionUpdateRequest)
+        {
+            try
+            {
+                string rawUsername = HttpContext.User.FindFirstValue("username");
+
+                var user = await userRepository.FindByNameAsync(rawUsername);
+                user.IsAgreeToTermsOfServiceVersion = termsOfServiceVerstionUpdateRequest.UpdatedVersion;
+                await userRepository.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(new { status = "fail", description = "version may invalid" });
+            }
             return Ok(new { status = "success" });
         }
     }

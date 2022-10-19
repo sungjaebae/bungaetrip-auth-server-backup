@@ -9,5 +9,6 @@ namespace AuthenticationServer.API.Entities
         public int MemberId { get; set; }
         [ForeignKey("MemberId")]
         public Member Member { get; set; }
+        public int IsAgreeToTermsOfServiceVersion { get; set; }
     }
 }

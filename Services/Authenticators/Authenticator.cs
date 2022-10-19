@@ -55,7 +55,8 @@ namespace AuthenticationServer.API.Services.Authenticators
                 AccessToken = accessToken.Value,
                 AccessTokenExpirationTime = accessToken.ExpirationTime,
                 RefreshToken = refreshToken,
-                Member = memberDto
+                Member = memberDto,
+                IsAgreeToTermsOfService = user.IsAgreeToTermsOfServiceVersion
             };
         }
     }
