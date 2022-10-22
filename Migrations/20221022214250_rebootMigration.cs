@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AuthenticationServer.API.Migrations
 {
-    public partial class member : Migration
+    public partial class rebootMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,7 +33,7 @@ namespace AuthenticationServer.API.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Member",
+                name: "member",
                 columns: table => new
                 {
                     member_id = table.Column<long>(type: "bigint(19)", nullable: false)
@@ -58,7 +58,7 @@ namespace AuthenticationServer.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Member", x => x.member_id);
+                    table.PrimaryKey("PK_member", x => x.member_id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -109,6 +109,7 @@ namespace AuthenticationServer.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     MemberId = table.Column<long>(type: "bigint(19)", nullable: false),
+                    IsAgreeToTermsOfServiceVersion = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -136,9 +137,9 @@ namespace AuthenticationServer.API.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Member_MemberId",
+                        name: "FK_AspNetUsers_member_MemberId",
                         column: x => x.MemberId,
-                        principalTable: "Member",
+                        principalTable: "member",
                         principalColumn: "member_id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -241,6 +242,40 @@ namespace AuthenticationServer.API.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.InsertData(
+                table: "member",
+                columns: new[] { "member_id", "age", "created_at", "deleted_at", "description", "email", "gender", "nickname", "password", "role", "username" },
+                values: new object[,]
+                {
+                    { 1L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(285), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail1@google.com", "FEMALE", "김성재", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername1" },
+                    { 2L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(355), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail2@google.com", "FEMALE", "최한별", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername2" },
+                    { 3L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(359), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail3@google.com", "MALE", "한두훈", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername3" },
+                    { 4L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(362), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail4@google.com", "FEMALE", "김한별", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername4" },
+                    { 5L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(409), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail5@google.com", "FEMALE", "한성재", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername5" },
+                    { 6L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(420), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail6@google.com", "MALE", "최형수", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername6" },
+                    { 7L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(423), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail7@google.com", "FEMALE", "최성재", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername7" },
+                    { 8L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(425), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail8@google.com", "FEMALE", "박두훈", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername8" },
+                    { 9L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(427), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail9@google.com", "FEMALE", "한진석", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername9" },
+                    { 10L, null, new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(430), new TimeSpan(0, 0, 0, 0, 0)), null, null, "seedMail10@google.com", "MALE", "한한별", "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", "ROLE_USER", "seedUsername10" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "IsAgreeToTermsOfServiceVersion", "LockoutEnabled", "LockoutEnd", "MemberId", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { 1, 0, "85e35ff3-ce9e-4a25-9adb-9f408804ad3d", "seedMail1@google.com", false, 0, false, null, 1L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername1" },
+                    { 2, 0, "4c611a98-e419-46c3-a238-ecab73857a03", "seedMail2@google.com", false, 0, false, null, 2L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername2" },
+                    { 3, 0, "f6ab5332-9e0a-48cc-a493-45b142deae7e", "seedMail3@google.com", false, 0, false, null, 3L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername3" },
+                    { 4, 0, "ea1ab3bd-6a85-4256-a975-8cff4a0881df", "seedMail4@google.com", false, 0, false, null, 4L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername4" },
+                    { 5, 0, "1cc68759-bdf6-41db-a46c-aaf03ce205c9", "seedMail5@google.com", false, 0, false, null, 5L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername5" },
+                    { 6, 0, "b764b89c-30d4-46bb-872c-eb89ecc62417", "seedMail6@google.com", false, 0, false, null, 6L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername6" },
+                    { 7, 0, "923fc466-66e9-473f-a584-36d74e6dd781", "seedMail7@google.com", false, 0, false, null, 7L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername7" },
+                    { 8, 0, "c658b62c-164e-4ce5-8e72-58e76334d4cf", "seedMail8@google.com", false, 0, false, null, 8L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername8" },
+                    { 9, 0, "d0a9c08d-77f9-43ac-8414-7d0b18d16303", "seedMail9@google.com", false, 0, false, null, 9L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername9" },
+                    { 10, 0, "bc55f51c-a1e4-4ee4-9de0-e968760c160c", "seedMail10@google.com", false, 0, false, null, 10L, null, null, "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK", null, false, null, false, "seedUsername10" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -311,7 +346,7 @@ namespace AuthenticationServer.API.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Member");
+                name: "member");
         }
     }
 }

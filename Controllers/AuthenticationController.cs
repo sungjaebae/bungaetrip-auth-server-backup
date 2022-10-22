@@ -3,7 +3,6 @@ using AuthenticationServer.API.Dtos;
 using AuthenticationServer.API.Dtos.Requests;
 using AuthenticationServer.API.Dtos.Responses;
 using AuthenticationServer.API.Entities;
-using AuthenticationServer.API.Migrations;
 using AuthenticationServer.API.Services.Authenticators;
 using AuthenticationServer.API.Services.MemberRepositories;
 using AuthenticationServer.API.Services.NicknameGenerators;

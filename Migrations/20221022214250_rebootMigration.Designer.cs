@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthenticationServer.API.Migrations
 {
     [DbContext(typeof(AuthenticationDbContext))]
-    [Migration("20221019061148_AddIsAgreeToTermsOfServiceVersion")]
-    partial class AddIsAgreeToTermsOfServiceVersion
+    [Migration("20221022214250_rebootMigration")]
+    partial class rebootMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,110 +76,110 @@ namespace AuthenticationServer.API.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(4923), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(285), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail1@google.com",
-                            Gender = "MALE",
+                            Gender = "FEMALE",
                             Nickname = "김성재",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername1"
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5031), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(355), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail2@google.com",
                             Gender = "FEMALE",
-                            Nickname = "이진석",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "최한별",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername2"
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5036), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(359), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail3@google.com",
                             Gender = "MALE",
-                            Nickname = "김한별",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "한두훈",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername3"
                         },
                         new
                         {
                             Id = 4L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5040), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(362), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail4@google.com",
                             Gender = "FEMALE",
-                            Nickname = "박저스틴",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "김한별",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername4"
                         },
                         new
                         {
                             Id = 5L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5043), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(409), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail5@google.com",
                             Gender = "FEMALE",
-                            Nickname = "최한별",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "한성재",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername5"
                         },
                         new
                         {
                             Id = 6L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5058), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(420), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail6@google.com",
                             Gender = "MALE",
-                            Nickname = "한한별",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "최형수",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername6"
                         },
                         new
                         {
                             Id = 7L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5061), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(423), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail7@google.com",
                             Gender = "FEMALE",
-                            Nickname = "최두훈",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "최성재",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername7"
                         },
                         new
                         {
                             Id = 8L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5063), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(425), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail8@google.com",
-                            Gender = "MALE",
-                            Nickname = "이한별",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Gender = "FEMALE",
+                            Nickname = "박두훈",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername8"
                         },
                         new
                         {
                             Id = 9L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5065), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(427), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail9@google.com",
-                            Gender = "MALE",
-                            Nickname = "이두훈",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Gender = "FEMALE",
+                            Nickname = "한진석",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername9"
                         },
                         new
                         {
                             Id = 10L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 19, 6, 11, 48, 625, DateTimeKind.Unspecified).AddTicks(5068), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2022, 10, 22, 21, 42, 50, 773, DateTimeKind.Unspecified).AddTicks(430), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "seedMail10@google.com",
                             Gender = "MALE",
-                            Nickname = "김저스틴",
-                            Password = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            Nickname = "한한별",
+                            Password = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             Role = "ROLE_USER",
                             UserName = "seedUsername10"
                         });
@@ -280,13 +280,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3c6f8f53-8f99-4fac-8f8b-bddf37d9db6d",
+                            ConcurrencyStamp = "85e35ff3-ce9e-4a25-9adb-9f408804ad3d",
                             Email = "seedMail1@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 1L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername1"
@@ -295,13 +295,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 2,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d496ad8c-4a8b-4414-ae2e-92db04eab255",
+                            ConcurrencyStamp = "4c611a98-e419-46c3-a238-ecab73857a03",
                             Email = "seedMail2@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 2L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername2"
@@ -310,13 +310,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e2d22ca0-260b-4b88-ac7a-6fabe3439059",
+                            ConcurrencyStamp = "f6ab5332-9e0a-48cc-a493-45b142deae7e",
                             Email = "seedMail3@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 3L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername3"
@@ -325,13 +325,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 4,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "551d1011-8c1f-4573-9cb4-0dcef9fe37a3",
+                            ConcurrencyStamp = "ea1ab3bd-6a85-4256-a975-8cff4a0881df",
                             Email = "seedMail4@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 4L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername4"
@@ -340,13 +340,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 5,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "97f298cd-622d-4788-b06a-3dc4aae48829",
+                            ConcurrencyStamp = "1cc68759-bdf6-41db-a46c-aaf03ce205c9",
                             Email = "seedMail5@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 5L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername5"
@@ -355,13 +355,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 6,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7e1f541b-de3f-4c1f-94bf-9fa4fafadbfb",
+                            ConcurrencyStamp = "b764b89c-30d4-46bb-872c-eb89ecc62417",
                             Email = "seedMail6@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 6L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername6"
@@ -370,13 +370,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 7,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "52e8445a-74b3-4200-bb8b-3420f1bcafae",
+                            ConcurrencyStamp = "923fc466-66e9-473f-a584-36d74e6dd781",
                             Email = "seedMail7@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 7L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername7"
@@ -385,13 +385,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 8,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0970ee4e-fff1-4100-9a8d-6ff932000276",
+                            ConcurrencyStamp = "c658b62c-164e-4ce5-8e72-58e76334d4cf",
                             Email = "seedMail8@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 8L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername8"
@@ -400,13 +400,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 9,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "298c9d1b-ee0e-46db-81c1-39878e853cbe",
+                            ConcurrencyStamp = "d0a9c08d-77f9-43ac-8414-7d0b18d16303",
                             Email = "seedMail9@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 9L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername9"
@@ -415,13 +415,13 @@ namespace AuthenticationServer.API.Migrations
                         {
                             Id = 10,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0af0473e-7cc7-40b1-b56c-1b9bb9d9d038",
+                            ConcurrencyStamp = "bc55f51c-a1e4-4ee4-9de0-e968760c160c",
                             Email = "seedMail10@google.com",
                             EmailConfirmed = false,
-                            IsAgreeToTermsOfServiceVersion = 1,
+                            IsAgreeToTermsOfServiceVersion = 0,
                             LockoutEnabled = false,
                             MemberId = 10L,
-                            PasswordHash = "$2a$11$5hR4FzsKur9m2yCMSCTF6.IFFeTM4KmW7fywgzN4R8BT6quA88VEG",
+                            PasswordHash = "$2a$11$ieLMeurrnhmxf0p0kKuu9.u1mfCC/tsaNYCnirnYxxMppFxiBMIRK",
                             PhoneNumberConfirmed = false,
                             TwoFactorEnabled = false,
                             UserName = "seedUsername10"

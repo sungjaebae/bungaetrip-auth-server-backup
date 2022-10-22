@@ -26,9 +26,9 @@ namespace AuthenticationServer.API.Controllers
         [HttpGet(Name = "AppSettingAndSecret")]
         public IActionResult Get()
         {
-            if (hostEnvironment.IsProduction())
+            if (hostEnvironment.IsProduction() || hostEnvironment.IsStaging() || hostEnvironment.IsDevelopment())
             {
-                return Ok(new { status = "in staging/production, no secret output" });
+                return Ok(new { status = "no secret output" });
             }
             return Ok(new { appSettings, appSecrets });
         }
