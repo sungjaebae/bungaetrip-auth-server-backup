@@ -20,4 +20,9 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY *.p8 ./
+COPY wait-for.sh ./
+RUN chmod 755 ./wait-for.sh
+RUN sed -i 's/\r$//' ./wait-for.sh
+RUN apt update && \
+    apt install netcat -y
 ENTRYPOINT ["dotnet", "AuthenticationServer.API.dll"]

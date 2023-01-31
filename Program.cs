@@ -63,7 +63,8 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(o =>
 builder.Services.AddDbContext<AuthenticationDbContext>(options =>
 {
     var connectionString = appSecrets.ConnectionStrings.DbConnectionString;
-    options.UseMySql(connectionString, ServerVersion.Parse("8.0.29"));
+    Console.WriteLine(connectionString);
+    options.UseMySql(connectionString, ServerVersion.Parse("8.0.32"));
 });
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
